@@ -10,6 +10,27 @@ df2 = []
 cols = []
 cols2 = []
 
+def select_columns():
+	global cols, cols2
+	temp_cols = cols
+	temp_col2s = cols2
+	label = Label(root, text="Select columns from file 1 to merge with file 2")
+	label.pack()
+	col1_sel = ttk.Combobox(root, value=temp_cols)
+	col1_sel.current(0)
+	col1_sel.pack(pady=10)
+	col2_sel = ttk.Combobox(root, value=temp_col2s)
+	col2_sel.current(0)
+	col2_sel.pack(pady=10)
+	merge_cols_button = Button(root, text="Merge Columns", command=merge_cols)
+	merge_cols_button.pack()
+	
+
+# Add file1_col to the final column list
+# Remove file1_col and file2_col from dropdowns
+def merge_cols(file1_col, file2_col): 
+
+
 # Do the actual merging
 def merge(): 
 	
@@ -40,7 +61,6 @@ def open_file_1():
 	    initialdir='/guis', title="Open CSV File", filetypes = (("CSV Files","*.csv"),))
 	df1 = pd.read_csv(root.filename)
 	cols = list(df1.columns)
-	show_select(cols)
 	load_first_button.pack_forget()
 	check_show_begin()
 
@@ -51,7 +71,6 @@ def open_file_2():
 	    initialdir='/guis', title="Open CSV File", filetypes = (("CSV Files","*.csv"),))
 	df2 = pd.read_csv(root.filename)
 	cols2 = list(df2.columns)
-	show_select(cols2)
 	load_second_button.pack_forget()
 	check_show_begin()
 
@@ -65,8 +84,11 @@ def show_select(options):
 def check_show_begin():
 	global df1, df2
 	if len(df1) > 0 and len(df2) > 0:
-		start_button = Button(root, text="Begin Merge", command=merge)
+		start_button = Button(root, text="Select Columns", command=select_columns)
 		start_button.pack()
+
+
+
 
 global load_first_button
 load_first_button = Button(root, text="Load First File", command=open_file_1)
