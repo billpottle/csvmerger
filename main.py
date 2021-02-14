@@ -12,6 +12,7 @@ cols = []
 cols2 = []
 final_cols = []
 merged_cols = []
+matched_cols = []
 
 
 def updateCols1():
@@ -24,6 +25,19 @@ col1_sel = ttk.Combobox(root, value=cols, postcommand= updateCols1)
 col2_sel = ttk.Combobox(root, value=cols2, postcommand = updateCols2)
 
 
+
+match_label = Label(root, text="Columns used to determine matched records")
+match_label.pack()
+match_fields_label = Label(root, text='Match columns = ')
+match_fields_label.pack()
+
+merge_label = Label(root, text="Select columns from file 1 to merge with file 2")
+merge_label.pack()
+merge_fields_label = Label(root, text='Merge columns = ')
+merge_fields_label.pack()
+
+
+
 def select_columns():
 	global cols, cols2, cols_sel, col2_sel
 	label = Label(root, text="Select columns from file 1 to merge with file 2")
@@ -32,46 +46,81 @@ def select_columns():
 	col1_sel.pack(pady=10)
 	col2_sel.pack(pady=10)
 
-	merge_cols_button = Button(root, text="Merge Columns", command=merge_cols)
+	merge_cols_button = Button(root, text="Add Merge Columns", command=merge_cols)
 	merge_cols_button.pack()
+
+	filter_cols_button = Button(root, text="Add Match Columns", command=match_cols)
+	filter_cols_button.pack()
 	
 
 # Add file1_col to the final column list
 # Remove file1_col and file2_col from dropdowns
 def merge_cols(): 
-	global final_cols, cols, cols2
+	global merged_cols, cols, cols2
 	print(cols, col1_sel.get())
 	merged_cols.append((col1_sel.get(), col2_sel.get()))
 	cols.remove(col1_sel.get())
 	cols2.remove(col2_sel.get())
-	print(merged_cols)
+	merge_fields_label.config(text = merged_cols)
 
+
+def match_cols(): 
+	global matched_cols, cols, cols2
+	print(cols, col1_sel.get())
+	matched_cols.append((col1_sel.get(), col2_sel.get()))
+	cols.remove(col1_sel.get())
+	cols2.remove(col2_sel.get())
+	match_fields_label.config(text = matched_cols)
+
+
+# Note: Each column name in each file should be unique within the file. 
+# Exact column names within 2 files should be merged
 
 # Do the actual merging
 def merge(): 
-	
+	global matched_cols, merged_cols
 	# Find the columns we are keeping
-	final_cols = cols + cols2
+	# Final columns will be the first column in each of match and merge, plus cols 1 + cols 2
+	final_cols = []
+	for i in range(len(matched_cols)): 
+		(first, second ) = matched_cols[i]
+		final_cols.append(first)
+
+	for i in range(len(merged_cols)): 
+		(first, second) = merged_cols[i]
+		final_cols.append(first)
+
+	for i in range(len(cols)): 
+		if i != 0: 
+			final_cols.append(cols[i])
+	
+	for i in range(len(cols2)): 
+		if i != 0: 
+			final_cols.append(cols2[i])
+
+	print(final_cols)
 	
 	# go through each row
 
+
 	# Need a list of lists for the final data
 	final_data = dict()
-	for ind in df1.index: 
-		record = []
-		for col in cols:
+	#for ind in df1.index: 
+		#record = []
+		#for col in cols:
 			#print(df1[col][ind]) 
-			record.append(df1[col][ind])
-		final_data[ind] = record
+			#record.append(df1[col][ind])
+		#final_data[ind] = record
 		
-	print('Final Data', final_data)
+	#print('Final Data', final_data)
 	# Maybe a good idea here to use a list of lists. New field will be id. 
-	final_df = pd.DataFrame(final_data, columns = final_cols)
-	print('Final data frame', final_df)
-	final_df.to_csv('output.csv')
+	#final_df = pd.DataFrame(final_data, columns = final_cols)
+	#print('Final data frame', final_df)
+	#final_df.to_csv('output.csv')
+
+
+
 # Create open dialog box function
-
-
 def open_file_1():
 	# Open File Dialog Box
 	global df1, cols
@@ -116,7 +165,8 @@ load_first_button.pack()
 load_second_button = Button(root, text="Load Second File", command=open_file_2)
 load_second_button.pack()
 
-
+merge_button = Button(root, text="Complete Merge", command = merge)
+merge_button.pack()
 # POPUP###############################
 from tkinter import messagebox
 def pop():
