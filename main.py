@@ -73,12 +73,39 @@ def match_cols():
 	match_fields_label.config(text = matched_cols)
 
 
+	# how to merge a row....
+		# Go through each column in file 1 and 2
+		# If match/merge
+			#If data in 1 and 2 are the same, use data in 1
+			#If data in 1 and 2 are different (couldn't be in match) use 1,2
+			#If data only in 1 or only 2, use data. 
+		# Else 
+			# Copy data from whichever file has it. 
+
+def merge_cells(cell1, cell2): 
+	if cell1 == '' and cell2 != '': 
+		return cell2
+	if cell2 == '' and cell1 != '': 
+		return cell1
+	if cell1 == cell2: 
+		return cell1
+	return cell1 + ', ' + cell2				
+
+def merge_rows(row1, row2): 
+	result = []
+	for col1 in row1: 
+		for col2 in row2:
+			result.append(merge_cells(col1, col2))
+	
+	return result
+
+
 # Note: Each column name in each file should be unique within the file. 
 # Exact column names within 2 files should be merged
 
 # Do the actual merging
 def merge(): 
-	global matched_cols, merged_cols
+	global matched_cols, merged_cols, df1, df2
 	# Find the columns we are keeping
 	# Final columns will be the first column in each of match and merge, plus cols 1 + cols 2
 	final_cols = []
@@ -100,7 +127,27 @@ def merge():
 
 	print(final_cols)
 	
-	# go through each row
+	# For each row in file 1
+	for row1 in df1: 
+
+	# Go through each row in file 2
+		for row2 in df2: 
+
+		# if there is a match
+		# copy the row to final data with data from file 2
+		# remove row from file 2
+		if rows_match(row1, row2):
+			final_data.append(merge_rows(row1, row2))
+			df2.drop(row2)
+
+		# else 
+		# copy the row to final data
+		else:
+			final_data.append(row1)
+
+	# Any remaining rows in df2 are not present in df1 
+	for row2 in df2:
+		final_data.append(row2)
 
 
 	# Need a list of lists for the final data
@@ -119,6 +166,14 @@ def merge():
 	#final_df.to_csv('output.csv')
 
 
+# Check if two rows match according to all match columns
+def rows_match(row1, row2):
+	global matched_cols
+	return True
+
+# merge a list of columns....
+def merge_row(row1, row2):
+	print(row1)
 
 # Create open dialog box function
 def open_file_1():
