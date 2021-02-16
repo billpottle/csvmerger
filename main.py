@@ -110,7 +110,7 @@ def merge():
 	# Final columns will be the first column in each of match and merge, plus cols 1 + cols 2
 	final_cols = []
 	for i in range(len(matched_cols)): 
-		(first, second ) = matched_cols[i]
+		(first, second) = matched_cols[i]
 		final_cols.append(first)
 
 	for i in range(len(merged_cols)): 
@@ -125,25 +125,23 @@ def merge():
 		if i != 0: 
 			final_cols.append(cols2[i])
 
-	print(final_cols)
+	print('Final cols are', final_cols)
 	
 	# For each row in file 1
-	for row1 in df1: 
-
+	print('file 1', df1)
+	for rownum in range(len(df1)): 
+		print('row 1 in df1', df1.iloc[rownum])
 	# Go through each row in file 2
 		for row2 in df2: 
-
 		# if there is a match
 		# copy the row to final data with data from file 2
 		# remove row from file 2
-		if rows_match(row1, row2):
-			final_data.append(merge_rows(row1, row2))
-			df2.drop(row2)
-
-		# else 
+			if rows_match(row1, row2):
+				final_data.append(merge_rows(row1, row2))
+				df2.drop(row2)
 		# copy the row to final data
-		else:
-			final_data.append(row1)
+			else:
+				final_data.append(row1)
 
 	# Any remaining rows in df2 are not present in df1 
 	for row2 in df2:
@@ -169,7 +167,14 @@ def merge():
 # Check if two rows match according to all match columns
 def rows_match(row1, row2):
 	global matched_cols
-	return True
+	print('matching row 1', row1)
+	print(row2)
+	match = True
+	for match in matched_cols:
+		print(match) 
+		if row1[match] != row2[match]:
+			match = False
+	return match
 
 # merge a list of columns....
 def merge_row(row1, row2):
