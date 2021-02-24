@@ -10,9 +10,14 @@ df1 = []
 df2 = []
 cols = []
 cols2 = []
+original_cols = []
+original_cols2 = []
 final_cols = []
 merged_cols = []
 matched_cols = []
+
+#0 means take from first file, 1 means take from 2nd, 2 means merged
+final_cols_mapping = []
 
 
 def updateCols1():
@@ -82,11 +87,6 @@ def match_cols():
 		# Else 
 			# Copy data from whichever file has it. 
 
-# return check if the ....?
-def should_merge(col1, col2):
-	global match_cols
-	#Need to do something with the final cols, and need names not just values... 
-	#I think I need like a mapping like [0,1,1,2,1] for final cols where 0 means take from file 1, 1 means take from file2, 2 means merge
 
 def merge_cells(cell1, cell2):
 	print('cells', cell1, cell2) 
@@ -99,7 +99,13 @@ def merge_cells(cell1, cell2):
 	return str(cell1) + ', ' + str(cell2)				
 
 def merge_rows(row1, row2): 
-	#I think I need like a mapping like [0,1,1,2,1] for final cols where 0 means take from file 1, 1 means take from file2, 2 means merge
+
+	result = []
+	for i in range(len(final_cols_mapping)):
+		if final_cols_mapping[i] == 0: 
+			result.append(row1)
+
+
 	result = []
 	for col1 in row1:
 		found_match = False
@@ -118,30 +124,50 @@ def merge_rows(row1, row2):
 # Note: Each column name in each file should be unique within the file. 
 # Exact column names within 2 files should be merged
 
+# Returns the position of the column in the row
+# get_col_pos('email', ['name', 'email', 'phone']) = 1
+def get_col_pos(name, row): 
+	print(row, name)
+	for i in range(len(row)): 
+		if row[i] == name:
+			print('returing', i)
+			return i
+	return -1
+
+
 # Do the actual merging
 def merge(): 
-	global matched_cols, merged_cols, df1, df2
+	global matched_cols, merged_cols, df1, df2, original_cols, original_cols2
 	# Find the columns we are keeping
 	# Final columns will be the first column in each of match and merge, plus cols 1 + cols 2
 	final_cols = []
 	final_data = []
 	for i in range(len(matched_cols)): 
 		(first, second) = matched_cols[i]
+		print('finding MATCH cols', first, second)
 		final_cols.append(first)
+		final_cols_mapping.append([0, get_col_pos(first, original_cols), -1])
 
 	for i in range(len(merged_cols)): 
 		(first, second) = merged_cols[i]
+		print('finding Merge cols', first, second)
 		final_cols.append(first)
+		final_cols_mapping.append([2, get_col_pos(first, original_cols), get_col_pos(second, original_cols2)])
 
 	for i in range(len(cols)): 
-		if i != 0: 
+		if i != 0:
+			print('appending from file 1', cols[i]) 
 			final_cols.append(cols[i])
+			final_cols_mapping.append([0, get_col_pos(cols[i], original_cols), -1])
 	
 	for i in range(len(cols2)): 
 		if i != 0: 
+			print('appending from file 2', cols2[i]) 
 			final_cols.append(cols2[i])
+			final_cols_mapping.append([1, get_col_pos(cols2[i], original_cols2), -1])
 
 	print('Final cols are', final_cols)
+	print('Final cols mapping', final_cols_mapping)
 	
 	# For each row in file 1
 	for rownum in range(len(df1)): 
@@ -194,22 +220,24 @@ def rows_match(row1, row2):
 # Create open dialog box function
 def open_file_1():
 	# Open File Dialog Box
-	global df1, cols
+	global df1, cols, original_cols
 	root.filename = filedialog.askopenfilename(
 	    initialdir='/guis', title="Open CSV File", filetypes = (("CSV Files","*.csv"),))
 	df1 = pd.read_csv(root.filename)
 	cols = list(df1.columns)
+	original_cols = list(df1.columns)
 	cols.insert(0, 'Column from File 1')
 	load_first_button.pack_forget()
 	check_show_begin()
 
 def open_file_2():
 	# Open File Dialog Box
-	global df2, cols2
+	global df2, cols2, original_cols2
 	root.filename = filedialog.askopenfilename(
 	    initialdir='/guis', title="Open CSV File", filetypes = (("CSV Files","*.csv"),))
 	df2 = pd.read_csv(root.filename)
 	cols2 = list(df2.columns)
+	original_cols2 = list(df2.columns)
 	cols2.insert(0, 'Column from File 2')
 	load_second_button.pack_forget()
 	check_show_begin()
