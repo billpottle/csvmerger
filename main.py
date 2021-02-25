@@ -168,6 +168,7 @@ def merge():
 		row1 = df1.iloc[rownum].values
 		print('row1')
 		print(row1)
+		match = False
 	# Go through each row in file 2
 		for rownum2 in range(len(df2)):
 			row2 = df2.iloc[rownum2].values  
@@ -183,9 +184,10 @@ def merge():
 				print(row2)
 				print('&&&&&&&&&&&&&&&&&&&&&&&&\n')
 				#df2.drop(row2.Name)
+				match = True
 		# copy the row to final data
-			else:
-				final_data.append(row1)
+		if match == False:
+			final_data.append(row1)
 
 	# Any remaining rows in df2 are not present in df1 
 	for row2 in df2:
