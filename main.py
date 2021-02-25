@@ -89,34 +89,29 @@ def match_cols():
 
 
 def merge_cells(cell1, cell2):
-	print('cells', cell1, cell2) 
-	if cell1 == '' and cell2 != '': 
+	cell1 = str(cell1)
+	cell2 = str(cell2)
+	if not cell1 and cell2: 
 		return cell2
-	if cell2 == '' and cell1 != '': 
+	if not cell2 and cell1: 
 		return cell1
 	if cell1 == cell2: 
 		return cell1
-	return str(cell1) + ', ' + str(cell2)				
+	return str(cell1) + ', ' + str(cell2)
 
 def merge_rows(row1, row2): 
 
 	result = []
 	for i in range(len(final_cols_mapping)):
-		if final_cols_mapping[i] == 0: 
-			result.append(row1)
-
-
-	result = []
-	for col1 in row1:
-		found_match = False
-		for col2 in row2:
-			if should_merge(co11, col2):
-				found_match = True
-				result.append(merge_cells(col1, col2))
-		# No match found, must only be in col 1
-		if (found_match == False):
-			result.append(col1)	
-		print('result', result)
+		if final_cols_mapping[i][0] == 0: 
+			result.append(row1[final_cols_mapping[1]])
+		if final_cols_mapping[i][0] == 1: 
+			result.append(row2[final_cols_mapping[2]])
+		if final_cols_mapping[i][0] == 2: 
+			result.append(
+				merge_cells(row1[final_cols_mapping[1]],
+				 row2[final_cols_mapping[2]])
+				 )
 	
 	return result
 
@@ -130,7 +125,6 @@ def get_col_pos(name, row):
 	print(row, name)
 	for i in range(len(row)): 
 		if row[i] == name:
-			print('returing', i)
 			return i
 	return -1
 
@@ -171,18 +165,24 @@ def merge():
 	
 	# For each row in file 1
 	for rownum in range(len(df1)): 
-		row1 = df1.iloc[rownum]
+		row1 = df1.iloc[rownum].values
+		print('row1')
+		print(row1)
 	# Go through each row in file 2
 		for rownum2 in range(len(df2)):
-			row2 = df2.iloc[rownum2]  
+			row2 = df2.iloc[rownum2].values  
 			# if there is a match
 			# copy the row to final data with data from file 2
 			# remove row from file 2
 			if rows_match(row1, row2):
-				print('merge result ==============')
-				print(merge_rows(row1, row2))
 				final_data.append(merge_rows(row1, row2))
-				df2.drop(row2)
+				print(final_data)
+				print('************************\n')
+				print(df2)
+				print('------------------------\n')
+				print(row2)
+				print('&&&&&&&&&&&&&&&&&&&&&&&&\n')
+				#df2.drop(row2.Name)
 		# copy the row to final data
 			else:
 				final_data.append(row1)
@@ -192,20 +192,13 @@ def merge():
 		final_data.append(row2)
 
 
-	# Need a list of lists for the final data
-	#final_data = dict()
-	#for ind in df1.index: 
-		#record = []
-		#for col in cols:
-			#print(df1[col][ind]) 
-			#record.append(df1[col][ind])
-		#final_data[ind] = record
-		
-	#print('Final Data', final_data)
+	print('final data after loops')
+	print(final_data)
+	final_cols.append('garbage')
 	# Maybe a good idea here to use a list of lists. New field will be id. 
-	#final_df = pd.DataFrame(final_data, columns = final_cols)
-	#print('Final data frame', final_df)
-	#final_df.to_csv('output.csv')
+	final_df = pd.DataFrame(final_data, columns = final_cols)
+	print('Final data frame', final_df)
+	final_df.to_csv('output.csv')
 
 
 # Check if two rows match according to all match columns
