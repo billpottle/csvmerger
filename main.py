@@ -1,3 +1,5 @@
+# WARN ON DUPLICATE COL NAMES WITHIN 1 file
+
 from tkinter import *
 from tkinter import ttk
 import pandas as pd
@@ -62,7 +64,6 @@ def select_columns():
 # Remove file1_col and file2_col from dropdowns
 def merge_cols(): 
 	global merged_cols, cols, cols2
-	print(cols, col1_sel.get())
 	merged_cols.append((col1_sel.get(), col2_sel.get()))
 	cols.remove(col1_sel.get())
 	cols2.remove(col2_sel.get())
@@ -71,7 +72,6 @@ def merge_cols():
 
 def match_cols(): 
 	global matched_cols, cols, cols2
-	print(cols, col1_sel.get())
 	matched_cols.append((col1_sel.get(), col2_sel.get()))
 	cols.remove(col1_sel.get())
 	cols2.remove(col2_sel.get())
@@ -104,13 +104,13 @@ def merge_rows(row1, row2):
 	result = []
 	for i in range(len(final_cols_mapping)):
 		if final_cols_mapping[i][0] == 0: 
-			result.append(row1[final_cols_mapping[1]])
+			result.append(row1[final_cols_mapping[i][1]])
 		if final_cols_mapping[i][0] == 1: 
-			result.append(row2[final_cols_mapping[2]])
+			result.append(row2[final_cols_mapping[i][2]])
 		if final_cols_mapping[i][0] == 2: 
 			result.append(
-				merge_cells(row1[final_cols_mapping[1]],
-				 row2[final_cols_mapping[2]])
+				merge_cells(row1[final_cols_mapping[i][1]],
+				 row2[final_cols_mapping[i][2]])
 				 )
 	
 	return result
@@ -138,35 +138,43 @@ def merge():
 	final_data = []
 	for i in range(len(matched_cols)): 
 		(first, second) = matched_cols[i]
-		print('finding MATCH cols', first, second)
 		final_cols.append(first)
-		final_cols_mapping.append([0, get_col_pos(first, original_cols), -1])
+		final_cols_mapping.append([0, get_col_pos(first, original_cols), -1])		
 
 	for i in range(len(merged_cols)): 
 		(first, second) = merged_cols[i]
-		print('finding Merge cols', first, second)
 		final_cols.append(first)
 		final_cols_mapping.append([2, get_col_pos(first, original_cols), get_col_pos(second, original_cols2)])
 
 	for i in range(len(cols)): 
 		if i != 0:
-			print('appending from file 1', cols[i]) 
 			final_cols.append(cols[i])
 			final_cols_mapping.append([0, get_col_pos(cols[i], original_cols), -1])
+
+	for i in range(len(matched_cols)): 
+		(first, second) = matched_cols[i]
+		final_cols.append(second)
+		final_cols_mapping.append([0, -1, get_col_pos(second, original_cols2)])
 	
 	for i in range(len(cols2)): 
 		if i != 0: 
-			print('appending from file 2', cols2[i]) 
 			final_cols.append(cols2[i])
-			final_cols_mapping.append([1, get_col_pos(cols2[i], original_cols2), -1])
+			final_cols_mapping.append([1, -1, get_col_pos(cols2[i], original_cols2)])
 
 	print('Final cols are', final_cols)
 	print('Final cols mapping', final_cols_mapping)
 	
+
+
+	test_data = []
+	test_data.append(df1.iloc[1].values)
+
+	to_drop = []
+	# For merge cols, copy all data to df1 and delete cols from df2 before beginning
+
 	# For each row in file 1
 	for rownum in range(len(df1)): 
 		row1 = df1.iloc[rownum].values
-		print('row1')
 		print(row1)
 		match = False
 	# Go through each row in file 2
@@ -183,20 +191,33 @@ def merge():
 				print('------------------------\n')
 				print(row2)
 				print('&&&&&&&&&&&&&&&&&&&&&&&&\n')
-				#df2.drop(row2.Name)
+				print(df2)
+				
+				to_drop.append(rownum2)
+				print('after drop', df2)
 				match = True
 		# copy the row to final data
 		if match == False:
 			final_data.append(row1)
 
 	# Any remaining rows in df2 are not present in df1 
-	for row2 in df2:
-		final_data.append(row2)
+	df2 = df2.drop(to_drop)
+	for rownum2 in range(len(df2)):
+		# go through final columns mapping and only put them in the correct columns..
+		final_row = []
+		row = df2.iloc[rownum2].values
+		for colnum2 in range(len(final_cols_mapping)):
+		
+			if (final_cols_mapping[colnum2][0] == 1):
+				final_row.append(row[final_cols_mapping[colnum2][2]])
+			else: 
+				final_row.append('')
 
+		final_data.append(final_row)
+		# should be able to go through final_cols_mapping and if it's 1 or 2, copy from the value
 
 	print('final data after loops')
 	print(final_data)
-	final_cols.append('garbage')
 	# Maybe a good idea here to use a list of lists. New field will be id. 
 	final_df = pd.DataFrame(final_data, columns = final_cols)
 	print('Final data frame', final_df)
@@ -204,11 +225,16 @@ def merge():
 
 
 # Check if two rows match according to all match columns
+
+#This function is always returning True
 def rows_match(row1, row2):
-	global matched_cols
+	global matched_cols, final_cols_mapping, original_cols2, original_cols
 	match = True
+	print(row1, row2)
 	for matched_col in matched_cols:
-		if row1[matched_col[0]] != row2[matched_col[1]]:
+		first = get_col_pos(matched_col[0], original_cols)
+		second = get_col_pos(matched_col[1], original_cols2)
+		if row1[first] != row2[second]:
 			match = False
 	return match
 
