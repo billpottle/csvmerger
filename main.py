@@ -7,7 +7,7 @@ from tkinter import filedialog
 from functools import partial
 
 root = Tk()
-root.geometry("400x400")
+root.geometry("800x600")
 df1 = []
 df2 = []
 cols = []
@@ -18,8 +18,26 @@ final_cols = []
 merged_cols = []
 matched_cols = []
 
+
+def new_merge():
+	pass
+
+
+my_menu = Menu(root)
+root.config(menu=my_menu)
+file_menu = Menu(my_menu, tearoff=0 )
+my_menu.add_cascade(label='File', menu=file_menu)
+file_menu.add_command(label='New Merge', command=new_merge)
+file_menu.add_command(label='Exit', command=root.quit)
+help_menu = Menu(my_menu, tearoff=0)
+my_menu.add_cascade(label='Help', menu=help_menu)
+help_menu.add_command(label='About', command=new_merge)
+help_menu.add_command(label='Instructions', command=root.quit)
+
 #0 means take from first file, 1 means take from 2nd, 2 means merged
 final_cols_mapping = []
+
+
 
 
 def updateCols1():
@@ -33,15 +51,6 @@ col2_sel = ttk.Combobox(root, value=cols2, postcommand = updateCols2)
 
 
 
-match_label = Label(root, text="Columns used to determine matched records")
-match_label.pack()
-match_fields_label = Label(root, text='Match columns = ')
-match_fields_label.pack()
-
-merge_label = Label(root, text="Select columns from file 1 to merge with file 2")
-merge_label.pack()
-merge_fields_label = Label(root, text='Merge columns = ')
-merge_fields_label.pack()
 
 
 
@@ -200,12 +209,11 @@ def merge():
 		final_row = []
 		row = df2.iloc[rownum2].values
 		for colnum2 in range(len(final_cols_mapping)):
-		
-			if (final_cols_mapping[colnum2][0] == 1):
-				final_row.append(row[final_cols_mapping[colnum2][2]])
-			else: 
+			if (final_cols_mapping[colnum2][0] == 0):
 				final_row.append('')
-
+			else: 
+				final_row.append(row[final_cols_mapping[colnum2][2]])
+				
 		final_data.append(final_row)
 		# should be able to go through final_cols_mapping and if it's 1 or 2, copy from the value
 
@@ -219,7 +227,10 @@ def merge():
 # Check if two rows match according to all match columns
 
 def rows_match(row1, row2):
+
 	global matched_cols, final_cols_mapping, original_cols2, original_cols
+	if len(matched_cols) == 0: 
+		return False 
 	match = True
 	for matched_col in matched_cols:
 		first = get_col_pos(matched_col[0], original_cols)
@@ -238,7 +249,6 @@ def open_file_1():
 	cols = list(df1.columns)
 	original_cols = list(df1.columns)
 	cols.insert(0, 'Column from File 1')
-	load_first_button.pack_forget()
 	check_show_begin()
 
 def open_file_2():
@@ -250,7 +260,6 @@ def open_file_2():
 	cols2 = list(df2.columns)
 	original_cols2 = list(df2.columns)
 	cols2.insert(0, 'Column from File 2')
-	load_second_button.pack_forget()
 	check_show_begin()
 
 
@@ -268,20 +277,43 @@ def check_show_begin():
 
 
 
+intro = Label(root, text='Welcome to CSV Merger. Follow the steps below or choose help in the menu for details')
+intro.grid(row=0, column= 0)
+
+step_1 = Label(root, text="Step 1 - Choose 2 files to merge:", font=('Helvetica', 24))
+step_1.grid(row=1, column = 0)
+
 
 global load_first_button
 load_first_button = Button(root, text="Load First File", command=open_file_1)
-load_first_button.pack()
+load_first_button.grid(row=2, column = 1)
 load_second_button = Button(root, text="Load Second File", command=open_file_2)
-load_second_button.pack()
+load_second_button.grid(row=2, column = 3)
+
+step_2 = Label(root, text="Step 2 - Choose Match and Merge Columns:", font=('Helvetica', 24))
+step_2.grid(row=3, column = 0)
+
+match_label = Label(root, text="Columns used to determine matched records")
+match_label.grid(row=4, column = 0)
+match_fields_label = Label(root, text='Match columns = ')
+match_fields_label.grid(row=5, column = 0)
+
+merge_label = Label(root, text="Select columns from file 1 to merge with file 2")
+merge_label.grid(row=6, column = 0)
+merge_fields_label = Label(root, text='Merge columns = ')
+merge_fields_label.grid(row=7, column = 0)
+
+step_3 = Label(root, text="Step 3 - Finalize merge to output.csv:", font=('Helvetica', 24))
+step_3.grid(row=8, column = 0)
 
 merge_button = Button(root, text="Complete Merge", command = merge)
-merge_button.pack()
+merge_buttonstep_2 = Label(root, text="Step 2 - Choose Match and Merge Columns:", font=('Helvetica', 24))
+step_2.grid(row=9, column = 0)
+
 # POPUP###############################
 from tkinter import messagebox
 def pop():
 	messagebox.showinfo("Title", "Hello World!")
 
-pop_button = Button(root, text="Popup", command=pop).pack()
 
 mainloop()
