@@ -8,19 +8,35 @@ from functools import partial
 
 root = Tk()
 root.geometry("800x600")
-df1 = []
-df2 = []
-cols = []
-cols2 = []
-original_cols = []
-original_cols2 = []
-final_cols = []
-merged_cols = []
-matched_cols = []
 
 
 def new_merge():
-	pass
+
+	# Restore Data State
+	df1 = []
+	df2 = []
+	cols = []
+	cols2 = []
+	original_cols = []
+	original_cols2 = []
+	final_cols = []
+	merged_cols = []
+	matched_cols = []
+	final_cols_mapping = []
+
+	# Restore UI state
+	load_first_button.grid(row=2, column = 0)
+	load_second_button.grid(row=2, column = 1)
+
+	col1_sel.grid_forget()
+	col2_sel.grid_forget()
+
+	done_cols_button.grid_forget()
+	filter_cols_button.grid_forget()
+	first_file_label.grid_forget()
+	second_file_label.grid_forget()
+
+
 
 
 my_menu = Menu(root)
@@ -34,10 +50,18 @@ my_menu.add_cascade(label='Help', menu=help_menu)
 help_menu.add_command(label='About', command=new_merge)
 help_menu.add_command(label='Instructions', command=root.quit)
 
-
-
+df1 = []
+df2 = []
+cols = []
+cols2 = []
+original_cols = []
+original_cols2 = []
+final_cols = []
+merged_cols = []
+matched_cols = []
 #0 means take from first file, 1 means take from 2nd, 2 means merged
 final_cols_mapping = []
+
 
 def updateCols1():
 	col1_sel['values'] = cols 
@@ -51,11 +75,13 @@ col2_sel = ttk.Combobox(root, value=cols2, postcommand = updateCols2)
 
 def choose_merge(): 
 
+	global merge_cols_button, filter_cols_button
 	col1_sel.grid(row=10, column = 0, pady=10)
 	col2_sel.grid(row=10, column = 1, pady=10)
 
 	merge_cols_button = Button(root, text="Add Merge Columns", command=merge_cols)
 	merge_cols_button.grid(row=11, column = 0, pady=10)
+	done_merge_button.grid(row=11, column = 1, pady=10)
 
 	done_cols_button.grid_forget()
 	filter_cols_button.grid_forget()
@@ -67,17 +93,8 @@ def select_columns():
 	col1_sel.grid(row=5, column = 0, pady=10)
 	col2_sel.grid(row=5, column = 1, pady=10)
 
-	#col1_sel.grid(row=10, column = 0, pady=10)
-	#col2_sel.grid(row=10, column = 1, pady=10)
-
-	#merge_cols_button = Button(root, text="Add Merge Columns", command=merge_cols)
-	#merge_cols_button.grid(row=5, column = 0, pady=10)
-
-
-	done_cols_button.grid(row=6,column=0, pady=10)
-
-	
-	filter_cols_button.grid(row=6, column = 1, pady=10)
+	done_cols_button.grid(row=6,column=1, pady=10)
+	filter_cols_button.grid(row=6, column = 0, pady=10)
 	
 
 # Add file1_col to the final column list
@@ -233,6 +250,8 @@ def merge():
 	final_df = pd.DataFrame(final_data, columns = final_cols)
 	print('Final data frame', final_df)
 	final_df.to_csv('output.csv')
+	merge_button.grid_forget()
+	done_label = Label(root, text='Merge successfully written to output.csv', fg= 'green')
 
 
 # Check if two rows match according to all match columns
@@ -262,7 +281,7 @@ def open_file_1():
 	cols.insert(0, 'Column from File 1')
 	check_show_begin()
 	load_first_button.grid_forget()
-	first_file_label = Label(root, text=root.filename + ' loaded', fg= 'blue' )
+	first_file_label.config(text=root.filename + ' loaded')
 	first_file_label.grid(row=2, column = 0)
 
 
@@ -277,7 +296,7 @@ def open_file_2():
 	cols2.insert(0, 'Column from File 2')
 	check_show_begin()
 	load_second_button.grid_forget()
-	second_file_label = Label(root, text=root.filename + ' loaded', fg= 'red' )
+	second_file_label.config(text=root.filename + ' loaded')
 	second_file_label.grid(row=2, column = 1)
 
 
@@ -286,22 +305,28 @@ def check_show_begin():
 	if len(df1) > 0 and len(df2) > 0:
 		select_columns()
 
+def start_finalize():
+	global done_cols_button, filter_cols_button
+	merge_button.grid(row = 15, column = 0, columnspan = 2)
+	done_merge_button.grid_forget()
+	merge_cols_button.grid_forget()
 
 
 intro = Label(root, text='Welcome to CSV Merger. Follow the steps below or choose help in the menu for details')
 intro.grid(row=0, column= 0, pady=10, columnspan=2)
 
-step_1 = Label(root, text="Step 1 - Choose 2 files to merge:", font=('Helvetica', 24))
+step_1 = Label(root, text="Step 1 - Choose 2 files to merge:", font=('Helvetica', 18))
 step_1.grid(row=1, column = 0, pady=10, columnspan=2)
 
-
-global load_first_button
 load_first_button = Button(root, text="Load First File", bg = '#FFFFFF', command=open_file_1)
 load_first_button.grid(row=2, column = 0)
+first_file_label = Label(root, text='', fg= 'blue' )
+	
 load_second_button = Button(root, text="Load Second File",bg = '#FFFFFF', command=open_file_2)
 load_second_button.grid(row=2, column = 1)
+second_file_label = Label(root, text='', fg= 'red' )
 
-step_2 = Label(root, text="Step 2 - Choose Match Columns:", font=('Helvetica', 24))
+step_2 = Label(root, text="Step 2 - Choose Match Columns:", font=('Helvetica', 18))
 step_2.grid(row = 3, column = 0, pady=10, columnspan=2)
 step2_ins = Label(root, text="Match columns are columns where you want to check if both files have an equal value.")
 step2_ins.grid(row = 4, columnspan = 2)
@@ -313,24 +338,28 @@ match_fields_label = Label(root, text='Match columns = ')
 match_fields_label.grid(row = 7, column = 0, columnspan = 2)
 
 
-step_3 = Label(root, text="Step 3 - Choose Merge Columns:", font=('Helvetica', 24))
+step_3 = Label(root, text="Step 3 - Choose Merge Columns:", font=('Helvetica', 18))
 step_3.grid(row=8, column = 0, pady=10, columnspan=2)
 step3_ins = Label(root, text='Merge columns are those that you want to merge together regardless')
 step3_ins.grid(row=9, column = 0, pady=10)
 
+
 # row 1o is the selects
 # row 11 is the button
+done_merge_button = Button(root, text="Merge Columns Complete", command=start_finalize, fg = '#FFFFFF', bg = 'green')
+
 
 merge_label = Label(root, text="Columns To be merged regardless")
 merge_label.grid(row = 12, column = 0)
 merge_fields_label = Label(root, text='Merge columns = ')
 merge_fields_label.grid(row = 13, column = 0)
 
-step_3 = Label(root, text="Step 4 - Finalize merge to output.csv:", font=('Helvetica', 24))
+step_3 = Label(root, text="Step 4 - Finalize merge to output.csv:", font=('Helvetica', 18))
 step_3.grid(row=14, column = 0, pady=10, columnspan=2)
 
 merge_button = Button(root, text="Complete Merge", fg = '#FFFFFF', bg = 'green' , command = merge)
-merge_button.grid(row = 15, column = 0, columnspan = 2)
+
+
 
 # POPUP###############################
 from tkinter import messagebox
