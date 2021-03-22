@@ -341,7 +341,7 @@ match_fields_label.grid(row = 7, column = 0, columnspan = 2)
 step_3 = Label(root, text="Step 3 - Choose Merge Columns:", font=('Helvetica', 18))
 step_3.grid(row=8, column = 0, pady=10, columnspan=2)
 step3_ins = Label(root, text='Merge columns are those that you want to merge together regardless')
-step3_ins.grid(row=9, column = 0, pady=10)
+step3_ins.grid(row=9, column = 0, pady=10, padx = 10)
 
 
 # row 1o is the selects
@@ -359,7 +359,38 @@ step_3.grid(row=14, column = 0, pady=10, columnspan=2)
 
 merge_button = Button(root, text="Complete Merge", fg = '#FFFFFF', bg = 'green' , command = merge)
 
+# Match Columns Frame
+selected_match_cols_frame = Frame(root, width=200, height=200, bg= 'white', bd = 1)
+selected_match_cols_frame.grid(row=3, column=2, rowspan = 3, padx=20)
 
+frame_label = Label(selected_match_cols_frame, text="Match Columns", bg = 'white')
+frame_label.grid(row = 0, column = 0, pady = 10, columnspan = 2)
+
+frame_file1 = Label(selected_match_cols_frame, text="File 1", fg='Red', bg='white')
+frame_file1.grid(row=1, column=0)
+
+frame_file1 = Label(selected_match_cols_frame, text="File 2", fg='blue', bg='white')
+frame_file1.grid(row=1, column=1)
+
+frame_label = Label(selected_match_cols_frame, text="					", bg='white')
+frame_label.grid(row = 2, column = 0, columnspan = 2)
+
+
+# Merge Columns Frame
+selected_merge_cols_frame = Frame(root, width=200, height=200, bg= 'white', bd = 1)
+selected_merge_cols_frame.grid(row=8, column=2, rowspan = 3, padx=20)
+
+frame_label = Label(selected_merge_cols_frame, text="Merge Columns", bg = 'white')
+frame_label.grid(row = 0, column = 0, columnspan = 2)
+
+frame_file1 = Label(selected_merge_cols_frame, text="File 1", fg='Red', bg='white')
+frame_file1.grid(row=1, column=0)
+
+frame_file1 = Label(selected_merge_cols_frame, text="File 2", fg='blue', bg='white')
+frame_file1.grid(row=1, column=1)
+
+frame_label = Label(selected_merge_cols_frame, text="					", bg='white')
+frame_label.grid(row = 2, column = 0, columnspan = 2)
 
 # POPUP###############################
 from tkinter import messagebox
