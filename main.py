@@ -100,19 +100,24 @@ def select_columns():
 # Add file1_col to the final column list
 # Remove file1_col and file2_col from dropdowns
 def merge_cols(): 
-	global merged_cols, cols, cols2
+	global merged_cols, cols, cols2, merge_frame
 	merged_cols.append((col1_sel.get(), col2_sel.get()))
+	temp = Label(merge_frame, text= (col1_sel.get() + '		'+ col2_sel.get()), anchor=W, justify=LEFT )
+	temp.pack()
 	cols.remove(col1_sel.get())
 	cols2.remove(col2_sel.get())
-	merge_fields_label.config(text = merged_cols)
+	
 
 
 def match_cols(): 
-	global matched_cols, cols, cols2
+	global matched_cols, cols, cols2, match_frame
 	matched_cols.append((col1_sel.get(), col2_sel.get()))
+	temp = Label(match_frame, text= (col1_sel.get() + '		'+ col2_sel.get()) , anchor='w', justify=LEFT)
+	temp.pack()
 	cols.remove(col1_sel.get())
 	cols2.remove(col2_sel.get())
-	match_fields_label.config(text = matched_cols)
+
+	#match_fields_label.config(text = matched_cols)
 
 
 	# how to merge a row....
@@ -334,8 +339,8 @@ step2_ins.grid(row = 4, columnspan = 2)
 done_cols_button = Button(root, text="Match Columns Complete", command=choose_merge, fg = '#FFFFFF', bg = 'green')
 filter_cols_button = Button(root, text="Add Match Column", command=match_cols)
 
-match_fields_label = Label(root, text='Match columns = ')
-match_fields_label.grid(row = 7, column = 0, columnspan = 2)
+#match_fields_label = Label(root, text='Match columns = ')
+#match_fields_label.grid(row = 7, column = 0, columnspan = 2)
 
 
 step_3 = Label(root, text="Step 3 - Choose Merge Columns:", font=('Helvetica', 18))
@@ -351,8 +356,8 @@ done_merge_button = Button(root, text="Merge Columns Complete", command=start_fi
 
 merge_label = Label(root, text="Columns To be merged regardless")
 merge_label.grid(row = 12, column = 0)
-merge_fields_label = Label(root, text='Merge columns = ')
-merge_fields_label.grid(row = 13, column = 0)
+#merge_fields_label = Label(root, text='Merge columns = ')
+#merge_fields_label.grid(row = 13, column = 0)
 
 step_3 = Label(root, text="Step 4 - Finalize merge to output.csv:", font=('Helvetica', 18))
 step_3.grid(row=14, column = 0, pady=10, columnspan=2)
@@ -364,7 +369,7 @@ selected_match_cols_frame = Frame(root, width=200, height=200, bg= 'white', bd =
 selected_match_cols_frame.grid(row=3, column=2, rowspan = 3, padx=20)
 
 frame_label = Label(selected_match_cols_frame, text="Match Columns", bg = 'white')
-frame_label.grid(row = 0, column = 0, pady = 10, columnspan = 2)
+frame_label.grid(row = 0, column = 0, columnspan = 2)
 
 frame_file1 = Label(selected_match_cols_frame, text="File 1", fg='Red', bg='white')
 frame_file1.grid(row=1, column=0)
@@ -374,6 +379,9 @@ frame_file1.grid(row=1, column=1)
 
 frame_label = Label(selected_match_cols_frame, text="					", bg='white')
 frame_label.grid(row = 2, column = 0, columnspan = 2)
+
+match_frame = Frame(selected_match_cols_frame, bg='white', bd=1)
+match_frame.grid(row=3, column=0)
 
 
 # Merge Columns Frame
@@ -391,6 +399,9 @@ frame_file1.grid(row=1, column=1)
 
 frame_label = Label(selected_merge_cols_frame, text="					", bg='white')
 frame_label.grid(row = 2, column = 0, columnspan = 2)
+
+merge_frame = Frame(selected_merge_cols_frame, bg='white', bd=1)
+merge_frame.grid(row=3, column=0)
 
 # POPUP###############################
 from tkinter import messagebox
