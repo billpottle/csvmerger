@@ -7,7 +7,7 @@ from tkinter import filedialog
 from functools import partial
 
 root = Tk()
-root.geometry("800x600")
+root.geometry("1000x800")
 
 
 def new_merge():
@@ -110,10 +110,15 @@ def merge_cols():
 
 
 def match_cols(): 
-	global matched_cols, cols, cols2, match_frame
+	global matched_cols, cols, cols2, selected_match_cols_frame
 	matched_cols.append((col1_sel.get(), col2_sel.get()))
-	temp = Label(match_frame, text= (col1_sel.get() + '		'+ col2_sel.get()) , anchor='w', justify=LEFT)
-	temp.pack()
+
+	col1_label = Label(selected_match_cols_frame, text= col1_sel.get(), bg='white')
+	col1_label.grid(row=(len(matched_cols) +1) , column=0, pady = 5)
+
+	col2_label = Label(selected_match_cols_frame, text= col2_sel.get(), bg='red')
+	col2_label.grid(row=len(matched_cols) + 1 , column=1, pady = 5)
+
 	cols.remove(col1_sel.get())
 	cols2.remove(col2_sel.get())
 
@@ -323,6 +328,16 @@ intro.grid(row=0, column= 0, pady=10, columnspan=2)
 step_1 = Label(root, text="Step 1 - Choose 2 files to merge:", font=('Helvetica', 18))
 step_1.grid(row=1, column = 0, pady=10, columnspan=2)
 
+case_sensitive = StringVar()
+case_sensitive_box = Checkbutton(root, text='Case Sensitive', variable = case_sensitive)
+case_sensitive_box.deselect()
+case_sensitive_box.grid(row=15, column=0)
+
+include_nicknames = StringVar()
+include_nicknames_box = Checkbutton(root, text='Include Nicknames', variable = include_nicknames)
+include_nicknames_box.deselect()
+include_nicknames_box.grid(row=15, column=1)
+
 load_first_button = Button(root, text="Load First File", bg = '#FFFFFF', command=open_file_1)
 load_first_button.grid(row=2, column = 0)
 first_file_label = Label(root, text='', fg= 'blue' )
@@ -366,7 +381,7 @@ merge_button = Button(root, text="Complete Merge", fg = '#FFFFFF', bg = 'green' 
 
 # Match Columns Frame
 selected_match_cols_frame = Frame(root, width=200, height=200, bg= 'white', bd = 1)
-selected_match_cols_frame.grid(row=3, column=2, rowspan = 3, padx=20)
+selected_match_cols_frame.grid(row=3, column=2, rowspan = 3, padx=20, pady=20)
 
 frame_label = Label(selected_match_cols_frame, text="Match Columns", bg = 'white')
 frame_label.grid(row = 0, column = 0, columnspan = 2)
@@ -380,8 +395,8 @@ frame_file1.grid(row=1, column=1)
 frame_label = Label(selected_match_cols_frame, text="					", bg='white')
 frame_label.grid(row = 2, column = 0, columnspan = 2)
 
-match_frame = Frame(selected_match_cols_frame, bg='white', bd=1)
-match_frame.grid(row=3, column=0)
+#match_frame = Frame(selected_match_cols_frame, bg='white', bd=1)
+#match_frame.grid(row=3, column=0)
 
 
 # Merge Columns Frame
