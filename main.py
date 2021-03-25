@@ -5,9 +5,14 @@ from tkinter import ttk
 import pandas as pd
 from tkinter import filedialog
 from functools import partial
+from nicknameparser import *
 
 root = Tk()
 root.geometry("1000x800")
+
+nicknames = NameDenormalizer()
+
+names = nicknames.get('bill')
 
 
 def new_merge():
@@ -35,8 +40,6 @@ def new_merge():
 	filter_cols_button.grid_forget()
 	first_file_label.grid_forget()
 	second_file_label.grid_forget()
-
-
 
 
 my_menu = Menu(root)
@@ -79,6 +82,9 @@ def choose_merge():
 	col1_sel.grid(row=10, column = 0, pady=10)
 	col2_sel.grid(row=10, column = 1, pady=10)
 
+	col1_sel.set('Column from File 1')
+	col2_sel.set('Column from File 2')
+
 	merge_cols_button = Button(root, text="Add Merge Columns", command=merge_cols)
 	merge_cols_button.grid(row=11, column = 0, pady=10)
 	done_merge_button.grid(row=11, column = 1, pady=10)
@@ -93,6 +99,9 @@ def select_columns():
 	col1_sel.grid(row=5, column = 0, pady=10)
 	col2_sel.grid(row=5, column = 1, pady=10)
 
+	col1_sel.set('Column from File 1')
+	col2_sel.set('Column from File 2')
+
 	done_cols_button.grid(row=6,column=1, pady=10)
 	filter_cols_button.grid(row=6, column = 0, pady=10)
 	
@@ -101,26 +110,50 @@ def select_columns():
 # Remove file1_col and file2_col from dropdowns
 def merge_cols(): 
 	global merged_cols, cols, cols2, merge_frame
+
+	if (col1_sel.get() == 'Column from File 1') or (col2_sel.get() == 'Column from File 2'): 
+		return
+
 	merged_cols.append((col1_sel.get(), col2_sel.get()))
-	temp = Label(merge_frame, text= (col1_sel.get() + '		'+ col2_sel.get()), anchor=W, justify=LEFT )
-	temp.pack()
+	
+	col1_label = Label(selected_merge_cols_frame, text= col1_sel.get(), bg='white')
+	col1_label.grid(row=(len(merged_cols) +1) , column=0, pady = 5)
+
+	col2_label = Label(selected_merge_cols_frame, text= col2_sel.get(), bg='white')
+	col2_label.grid(row=len(merged_cols) + 1 , column=1, pady = 5)
+	
 	cols.remove(col1_sel.get())
 	cols2.remove(col2_sel.get())
+
+	updateCols1()
+	updateCols2()
 	
+	col1_sel.set('Column from File 1')
+	col2_sel.set('Column from File 2')
 
 
 def match_cols(): 
 	global matched_cols, cols, cols2, selected_match_cols_frame
+
+	if (col1_sel.get() == 'Column from File 1') or (col2_sel.get() == 'Column from File 2'): 
+		return
+
 	matched_cols.append((col1_sel.get(), col2_sel.get()))
 
 	col1_label = Label(selected_match_cols_frame, text= col1_sel.get(), bg='white')
 	col1_label.grid(row=(len(matched_cols) +1) , column=0, pady = 5)
 
-	col2_label = Label(selected_match_cols_frame, text= col2_sel.get(), bg='red')
+	col2_label = Label(selected_match_cols_frame, text= col2_sel.get(), bg='white')
 	col2_label.grid(row=len(matched_cols) + 1 , column=1, pady = 5)
 
 	cols.remove(col1_sel.get())
 	cols2.remove(col2_sel.get())
+
+	updateCols1()
+	updateCols2()
+
+	col1_sel.set('Column from File 1')
+	col2_sel.set('Column from File 2')
 
 	#match_fields_label.config(text = matched_cols)
 
@@ -135,6 +168,14 @@ def match_cols():
 			# Copy data from whichever file has it. 
 
 
+def items_match(a,b) : 
+	global case_sensitive
+	if not case_sensitive: 
+		return a.lower() == b.lower()
+	else: 
+		return a == b
+
+
 def merge_cells(cell1, cell2):
 	cell1 = str(cell1)
 	cell2 = str(cell2)
@@ -143,7 +184,8 @@ def merge_cells(cell1, cell2):
 		return cell2
 	if not cell2 and cell1: 
 		return cell1
-	if cell1 == cell2: 
+
+	if items_match(cell1, cell2): 
 		return cell1
 	return str(cell1) + ', ' + str(cell2)
 
@@ -317,7 +359,7 @@ def check_show_begin():
 
 def start_finalize():
 	global done_cols_button, filter_cols_button
-	merge_button.grid(row = 15, column = 0, columnspan = 2)
+	merge_button.grid(row = 16, column = 0, columnspan = 2)
 	done_merge_button.grid_forget()
 	merge_cols_button.grid_forget()
 
