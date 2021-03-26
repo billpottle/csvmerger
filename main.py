@@ -1,10 +1,11 @@
-# WARN ON DUPLICATE COL NAMES WITHIN 1 file
+# Add a source column
+# include nicknames is PY_VAR1 instead of false to start
 
 from tkinter import *
 from tkinter import ttk
-import pandas as pd
+from tkinter import messagebox
 from tkinter import filedialog
-from functools import partial
+import pandas as pd
 from nicknameparser import *
 
 root = Tk()
@@ -12,7 +13,7 @@ root.geometry("1000x800")
 
 nicknames = NameDenormalizer()
 
-names = nicknames.get('bill')
+
 
 
 def new_merge():
@@ -71,6 +72,10 @@ def updateCols1():
 
 def updateCols2():
 	col2_sel['values'] = cols2 
+
+	
+def duplicate_col_warning():
+	messagebox.showinfo("Warning", "This file contains more than one column with the same name. Please edit the original file and restart the merge")
 
 col1_sel = ttk.Combobox(root, value=cols, postcommand= updateCols1)
 col2_sel = ttk.Combobox(root, value=cols2, postcommand = updateCols2)
@@ -169,11 +174,29 @@ def match_cols():
 
 
 def items_match(a,b) : 
-	global case_sensitive
-	if not case_sensitive: 
-		return a.lower() == b.lower()
-	else: 
+	global case_sensitive, include_nicknames
+	print(a,b)
+	# create a set including all nicknames
+	if include_nicknames: 
+		a_names = nicknames.get(a, {})
+		b_names = nicknames.get(b, {})
+		a_names_lower = {}
+		if a_names: 
+			a_names_lower = set(n.lower() for n in a_names)
+		b_names_lower = {}
+		if b_names: 
+			b_names_lower = set(n.lower() for n in b_names)
+
+	print('include nicknames' , include_nicknames)
+
+	if case_sensitive and not include_nicknames: 
 		return a == b
+	if case_sensitive and include_nicknames:
+		return a == b or a in b_names or b in a_names
+	if not case_sensitive and not include_nicknames:
+		return a.lower() == b.lower()
+	if not case_sensitive and include_nicknames: 
+		return a==b or a.lower() in b_names_lower or b.lower in a_names_lower
 
 
 def merge_cells(cell1, cell2):
@@ -304,6 +327,7 @@ def merge():
 	final_df.to_csv('output.csv')
 	merge_button.grid_forget()
 	done_label = Label(root, text='Merge successfully written to output.csv', fg= 'green')
+	done_label.grid(row = 16, column = 0, columnspan = 2)
 
 
 # Check if two rows match according to all match columns
@@ -317,7 +341,7 @@ def rows_match(row1, row2):
 	for matched_col in matched_cols:
 		first = get_col_pos(matched_col[0], original_cols)
 		second = get_col_pos(matched_col[1], original_cols2)
-		if row1[first] != row2[second]:
+		if not items_match(row1[first], row2[second]):
 			match = False
 	return match
 
@@ -362,6 +386,10 @@ def start_finalize():
 	merge_button.grid(row = 16, column = 0, columnspan = 2)
 	done_merge_button.grid_forget()
 	merge_cols_button.grid_forget()
+	col1_sel.grid_forget()
+	col2_sel.grid_forget()
+
+
 
 
 intro = Label(root, text='Welcome to CSV Merger. Follow the steps below or choose help in the menu for details')
@@ -396,25 +424,16 @@ step2_ins.grid(row = 4, columnspan = 2)
 done_cols_button = Button(root, text="Match Columns Complete", command=choose_merge, fg = '#FFFFFF', bg = 'green')
 filter_cols_button = Button(root, text="Add Match Column", command=match_cols)
 
-#match_fields_label = Label(root, text='Match columns = ')
-#match_fields_label.grid(row = 7, column = 0, columnspan = 2)
-
-
 step_3 = Label(root, text="Step 3 - Choose Merge Columns:", font=('Helvetica', 18))
 step_3.grid(row=8, column = 0, pady=10, columnspan=2)
 step3_ins = Label(root, text='Merge columns are those that you want to merge together regardless')
-step3_ins.grid(row=9, column = 0, pady=10, padx = 10)
+step3_ins.grid(row=9, column = 0, columnspan = 2)
 
 
 # row 1o is the selects
 # row 11 is the button
 done_merge_button = Button(root, text="Merge Columns Complete", command=start_finalize, fg = '#FFFFFF', bg = 'green')
 
-
-merge_label = Label(root, text="Columns To be merged regardless")
-merge_label.grid(row = 12, column = 0)
-#merge_fields_label = Label(root, text='Merge columns = ')
-#merge_fields_label.grid(row = 13, column = 0)
 
 step_3 = Label(root, text="Step 4 - Finalize merge to output.csv:", font=('Helvetica', 18))
 step_3.grid(row=14, column = 0, pady=10, columnspan=2)
@@ -437,9 +456,6 @@ frame_file1.grid(row=1, column=1)
 frame_label = Label(selected_match_cols_frame, text="					", bg='white')
 frame_label.grid(row = 2, column = 0, columnspan = 2)
 
-#match_frame = Frame(selected_match_cols_frame, bg='white', bd=1)
-#match_frame.grid(row=3, column=0)
-
 
 # Merge Columns Frame
 selected_merge_cols_frame = Frame(root, width=200, height=200, bg= 'white', bd = 1)
@@ -460,10 +476,6 @@ frame_label.grid(row = 2, column = 0, columnspan = 2)
 merge_frame = Frame(selected_merge_cols_frame, bg='white', bd=1)
 merge_frame.grid(row=3, column=0)
 
-# POPUP###############################
-from tkinter import messagebox
-def pop():
-	messagebox.showinfo("Title", "Hello World!")
 
 
 mainloop()
