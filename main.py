@@ -1,6 +1,3 @@
-# Add a source column
-# include nicknames is PY_VAR1 instead of false to start
-
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -12,9 +9,6 @@ root = Tk()
 root.geometry("1000x800")
 
 nicknames = NameDenormalizer()
-
-
-
 
 def new_merge():
 
@@ -41,11 +35,12 @@ def new_merge():
 	filter_cols_button.grid_forget()
 	first_file_label.grid_forget()
 	second_file_label.grid_forget()
+	add_or_button.grid_forget()
 
-
+# Initialize Menu
 my_menu = Menu(root)
 root.config(menu=my_menu)
-file_menu = Menu(my_menu, tearoff=0 )
+file_menu = Menu(my_menu, tearoff=0)
 my_menu.add_cascade(label='File', menu=file_menu)
 file_menu.add_command(label='New Merge', command=new_merge)
 file_menu.add_command(label='Exit', command=root.quit)
@@ -54,6 +49,7 @@ my_menu.add_cascade(label='Help', menu=help_menu)
 help_menu.add_command(label='About', command=new_merge)
 help_menu.add_command(label='Instructions', command=root.quit)
 
+# Initialize Data structures
 df1 = []
 df2 = []
 cols = []
@@ -63,9 +59,8 @@ original_cols2 = []
 final_cols = []
 merged_cols = []
 matched_cols = []
-#0 means take from first file, 1 means take from 2nd, 2 means merged
+#0 means take value from first file, 1 means take from 2nd, 2 means merged
 final_cols_mapping = []
-
 
 def updateCols1():
 	col1_sel['values'] = cols 
@@ -73,14 +68,13 @@ def updateCols1():
 def updateCols2():
 	col2_sel['values'] = cols2 
 
-	
 def duplicate_col_warning():
 	messagebox.showinfo("Warning", "This file contains more than one column with the same name. Please edit the original file and restart the merge")
 
 col1_sel = ttk.Combobox(root, value=cols, postcommand= updateCols1)
 col2_sel = ttk.Combobox(root, value=cols2, postcommand = updateCols2)
 
-
+# Choose the columns to merge
 def choose_merge(): 
 
 	global merge_cols_button, filter_cols_button
@@ -96,6 +90,7 @@ def choose_merge():
 
 	done_cols_button.grid_forget()
 	filter_cols_button.grid_forget()
+	add_or_button.grid_forget()
 
 
 def select_columns():
@@ -107,7 +102,8 @@ def select_columns():
 	col1_sel.set('Column from File 1')
 	col2_sel.set('Column from File 2')
 
-	done_cols_button.grid(row=6,column=1, pady=10)
+	add_or_button.grid(row=6,column=1, pady=10)
+	done_cols_button.grid(row=6,column=2, pady=10)
 	filter_cols_button.grid(row=6, column = 0, pady=10)
 	
 
@@ -116,6 +112,7 @@ def select_columns():
 def merge_cols(): 
 	global merged_cols, cols, cols2, merge_frame
 
+	# Make sure they have selected a column
 	if (col1_sel.get() == 'Column from File 1') or (col2_sel.get() == 'Column from File 2'): 
 		return
 
@@ -136,7 +133,7 @@ def merge_cols():
 	col1_sel.set('Column from File 1')
 	col2_sel.set('Column from File 2')
 
-
+# Choose cols that should be used to determine a duplicate record
 def match_cols(): 
 	global matched_cols, cols, cols2, selected_match_cols_frame
 
@@ -158,21 +155,20 @@ def match_cols():
 	updateCols2()
 
 	col1_sel.set('Column from File 1')
-	col2_sel.set('Column from File 2')
+	col2_sel.set('Column from File 2') 
 
-	#match_fields_label.config(text = matched_cols)
+def add_or_condition():
+	global matched_cols
 
-
-	# how to merge a row....
-		# Go through each column in file 1 and 2
-		# If match/merge
-			#If data in 1 and 2 are the same, use data in 1
-			#If data in 1 and 2 are different (couldn't be in match) use 1,2
-			#If data only in 1 or only 2, use data. 
-		# Else 
-			# Copy data from whichever file has it. 
+	if ((matched_cols[len(matched_cols) - 1]) == ('OR', 'OR')):
+		return
+	
+	matched_cols.append(('OR', 'OR'))	
+	col1_label = Label(selected_match_cols_frame, text= '---OR---', bg='white')
+	col1_label.grid(row=(len(matched_cols) +1) , column=0, pady = 5)
 
 
+# Determine if 2 items match
 def items_match(a,b) : 
 	global case_sensitive, include_nicknames
 	print(a,b)
@@ -187,8 +183,7 @@ def items_match(a,b) :
 		if b_names: 
 			b_names_lower = set(n.lower() for n in b_names)
 
-	print('include nicknames' , include_nicknames)
-
+	# Handle 4 potential cases
 	if case_sensitive and not include_nicknames: 
 		return a == b
 	if case_sensitive and include_nicknames:
@@ -198,7 +193,7 @@ def items_match(a,b) :
 	if not case_sensitive and include_nicknames: 
 		return a==b or a.lower() in b_names_lower or b.lower in a_names_lower
 
-
+# Merge two cells
 def merge_cells(cell1, cell2):
 	cell1 = str(cell1)
 	cell2 = str(cell2)
@@ -212,16 +207,27 @@ def merge_cells(cell1, cell2):
 		return cell1
 	return str(cell1) + ', ' + str(cell2)
 
+# how to merge a row....
+	# Go through each column in file 1 and 2
+	# If match/merge
+		#If data in 1 and 2 are the same, use data in 1
+		#If data in 1 and 2 are different (couldn't be in match) use 1,2
+		#If data only in 1 or only 2, use data. 
+	# Else 
+		# Copy data from whichever file has it.
+
 def merge_rows(row1, row2): 
 	print('merging rows', row1, row2)
 	result = []
 	for i in range(len(final_cols_mapping)):
+		# Copy from file 1
 		if final_cols_mapping[i][0] == 0: 
 			result.append(row1[final_cols_mapping[i][1]])
+		# Copy from file 2
 		if final_cols_mapping[i][0] == 1: 
 			result.append(row2[final_cols_mapping[i][2]])
+		# Merge the two cells
 		if final_cols_mapping[i][0] == 2: 
-			print('r12', row1, row2)
 			result.append(
 				merge_cells(row1[final_cols_mapping[i][1]],
 				 row2[final_cols_mapping[i][2]])
@@ -231,10 +237,10 @@ def merge_rows(row1, row2):
 
 
 # Note: Each column name in each file should be unique within the file. 
-# Exact column names within 2 files should be merged
+# Exact column names between 2 files should be merged
 
 # Returns the position of the column in the row
-# get_col_pos('email', ['name', 'email', 'phone']) = 1
+# for instance, get_col_pos('email', ['name', 'email', 'phone']) = 1
 def get_col_pos(name, row): 
 	for i in range(len(row)): 
 		if row[i] == name:
@@ -277,8 +283,6 @@ def merge():
 	print('Final cols are', final_cols)
 	print('Final cols mapping', final_cols_mapping)
 	
-
-
 	test_data = []
 	test_data.append(df1.iloc[1].values)
 
@@ -321,10 +325,12 @@ def merge():
 		# should be able to go through final_cols_mapping and if it's 1 or 2, copy from the value
 
 
-	# Maybe a good idea here to use a list of lists. New field will be id. 
+	# Create the final data frame and write to file
 	final_df = pd.DataFrame(final_data, columns = final_cols)
 	print('Final data frame', final_df)
 	final_df.to_csv('output.csv')
+
+	# Update UI
 	merge_button.grid_forget()
 	done_label = Label(root, text='Merge successfully written to output.csv', fg= 'green')
 	done_label.grid(row = 16, column = 0, columnspan = 2)
@@ -391,7 +397,7 @@ def start_finalize():
 
 
 
-
+# Main UI Code
 intro = Label(root, text='Welcome to CSV Merger. Follow the steps below or choose help in the menu for details')
 intro.grid(row=0, column= 0, pady=10, columnspan=2)
 
@@ -422,6 +428,7 @@ step2_ins = Label(root, text="Match columns are columns where you want to check 
 step2_ins.grid(row = 4, columnspan = 2)
 
 done_cols_button = Button(root, text="Match Columns Complete", command=choose_merge, fg = '#FFFFFF', bg = 'green')
+add_or_button = Button(root, text="Add Or Condition", command=add_or_condition)
 filter_cols_button = Button(root, text="Add Match Column", command=match_cols)
 
 step_3 = Label(root, text="Step 3 - Choose Merge Columns:", font=('Helvetica', 18))
