@@ -77,7 +77,7 @@ col2_sel = ttk.Combobox(root, value=cols2, postcommand = updateCols2)
 # Choose the columns to merge
 def choose_merge(): 
 
-	global merge_cols_button, filter_cols_button
+	global merge_cols_button, filter_cols_button, matched_cols
 	col1_sel.grid(row=10, column = 0, pady=10)
 	col2_sel.grid(row=10, column = 1, pady=10)
 
@@ -87,6 +87,11 @@ def choose_merge():
 	merge_cols_button = Button(root, text="Add Merge Columns", command=merge_cols)
 	merge_cols_button.grid(row=11, column = 0, pady=10)
 	done_merge_button.grid(row=11, column = 1, pady=10)
+
+	if ((matched_cols[len(matched_cols) - 1]) == ('OR', 'OR')):
+		matched_cols.pop()
+		col1_label = Label(selected_match_cols_frame, text= '              ', bg='white')
+		col1_label.grid(row=(len(matched_cols) +2) , column=0, pady = 5)
 
 	done_cols_button.grid_forget()
 	filter_cols_button.grid_forget()
@@ -336,7 +341,7 @@ def merge():
 	done_label.grid(row = 16, column = 0, columnspan = 2)
 
 
-# Check if two rows match according to all match columns
+# Check if two rows match according to match cols
 
 def rows_match(row1, row2):
 
@@ -344,6 +349,21 @@ def rows_match(row1, row2):
 	if len(matched_cols) == 0: 
 		return False 
 	match = True
+
+	# Extract out the or sets
+	# 2 rows match if ALL conditions in ANY of the OR conditions matches. 
+	or_conditions = []
+	and_conditions = []
+	for col in matched_cols:
+		if col != ('OR', 'OR'): 
+			and_conditions.append(col)
+		else:
+			or_conditions.append(and_conditions)
+			and_conditions = []
+	or_conditions.append(and_conditions)
+	
+	print('Or conditions are', or_conditions)
+	
 	for matched_col in matched_cols:
 		first = get_col_pos(matched_col[0], original_cols)
 		second = get_col_pos(matched_col[1], original_cols2)
