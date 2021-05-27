@@ -1,3 +1,6 @@
+# Clear second table on new merge
+# instructions
+
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -260,10 +263,12 @@ def merge():
 	# Final columns will be the first column in each of match and merge, plus cols 1 + cols 2
 	final_cols = []
 	final_data = []
+	
 	for i in range(len(matched_cols)): 
 		(first, second) = matched_cols[i]
-		final_cols.append(first)
-		final_cols_mapping.append([0, get_col_pos(first, original_cols), -1])		
+		if first != 'OR':
+			final_cols.append(first)
+			final_cols_mapping.append([0, get_col_pos(first, original_cols), -1])		
 
 	for i in range(len(merged_cols)): 
 		(first, second) = merged_cols[i]
@@ -275,10 +280,11 @@ def merge():
 			final_cols.append(cols[i])
 			final_cols_mapping.append([0, get_col_pos(cols[i], original_cols), -1])
 
-	for i in range(len(matched_cols)): 
-		(first, second) = matched_cols[i]
-		final_cols.append(second)
-		final_cols_mapping.append([1, -1, get_col_pos(second, original_cols2)])
+#	for i in range(len(matched_cols)): 
+#		(first, second) = matched_cols[i]
+#		if second != 'OR':
+#			final_cols.append(second)
+#			final_cols_mapping.append([1, -1, get_col_pos(second, original_cols2)])
 	
 	for i in range(len(cols2)): 
 		if i != 0: 
@@ -364,12 +370,14 @@ def rows_match(row1, row2):
 	
 	print('Or conditions are', or_conditions)
 	
-	for matched_col in matched_cols:
-		first = get_col_pos(matched_col[0], original_cols)
-		second = get_col_pos(matched_col[1], original_cols2)
-		if not items_match(row1[first], row2[second]):
-			match = False
-	return match
+	for condition in or_conditions:
+		for matched_col in condition:
+			first = get_col_pos(matched_col[0], original_cols)
+			second = get_col_pos(matched_col[1], original_cols2)
+			if not items_match(row1[first], row2[second]):
+				return False
+		
+	return True
 
 # Create open dialog box function
 def open_file_1():
@@ -457,7 +465,7 @@ step3_ins = Label(root, text='Merge columns are those that you want to merge tog
 step3_ins.grid(row=9, column = 0, columnspan = 2)
 
 
-# row 1o is the selects
+# row 10 is the selects
 # row 11 is the button
 done_merge_button = Button(root, text="Merge Columns Complete", command=start_finalize, fg = '#FFFFFF', bg = 'green')
 
