@@ -268,7 +268,8 @@ def merge():
 		(first, second) = matched_cols[i]
 		if first != 'OR':
 			final_cols.append(first)
-			final_cols_mapping.append([0, get_col_pos(first, original_cols), -1])		
+			#final_cols_mapping.append([0, get_col_pos(first, original_cols), -1])
+			final_cols_mapping.append([2, get_col_pos(first, original_cols), get_col_pos(second, original_cols2)])		
 
 	for i in range(len(merged_cols)): 
 		(first, second) = merged_cols[i]
@@ -310,6 +311,8 @@ def merge():
 			# if there is a match
 			# copy the row to final data with data from file 2
 			# remove row from file 2
+			print('rows match', row1, row2, rows_match(row1, row2))
+			print('---------------------------------------------\n')
 			if rows_match(row1, row2):
 				final_data.append(merge_rows(row1, row2))
 				match = True
@@ -354,8 +357,7 @@ def rows_match(row1, row2):
 	global matched_cols, final_cols_mapping, original_cols2, original_cols
 	if len(matched_cols) == 0: 
 		return False 
-	match = True
-
+	
 	# Extract out the or sets
 	# 2 rows match if ALL conditions in ANY of the OR conditions matches. 
 	or_conditions = []
@@ -367,17 +369,22 @@ def rows_match(row1, row2):
 			or_conditions.append(and_conditions)
 			and_conditions = []
 	or_conditions.append(and_conditions)
+
 	
-	print('Or conditions are', or_conditions)
-	
-	for condition in or_conditions:
+	for i in range (len(or_conditions)):
+		condition = or_conditions[i]
+		print('condition', condition)
+		any_match = True
 		for matched_col in condition:
 			first = get_col_pos(matched_col[0], original_cols)
 			second = get_col_pos(matched_col[1], original_cols2)
+			#print(condition, matched_col, first, second)
 			if not items_match(row1[first], row2[second]):
-				return False
+				any_match = False
+		if (any_match):
+			return True
 		
-	return True
+	return False
 
 # Create open dialog box function
 def open_file_1():
