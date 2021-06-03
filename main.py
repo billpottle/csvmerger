@@ -3,12 +3,14 @@
 
 from tkinter import *
 from tkinter import ttk
+from PIL import ImageTk, Image
 from tkinter import messagebox
 from tkinter import filedialog
 import pandas as pd
 from nicknameparser import *
 
 root = Tk()
+root.title('CSV Merger')
 root.geometry("1000x800")
 
 nicknames = NameDenormalizer()
@@ -40,6 +42,25 @@ def new_merge():
 	second_file_label.grid_forget()
 	add_or_button.grid_forget()
 
+def about_popup():
+	messagebox.showinfo("About CSV Merger", "Open source utility to merge csv files. Created by Bill Pottle. Suggestions and PRs welcome at https://github.com/billpottle/csvmerger")
+
+def open_instructions():
+	new = Toplevel()
+	new.title('Instructions')
+	new.geometry("800x600")
+
+	my_label = Label(new, text='Instructions for using CSV Merger')
+	my_label.pack(pady=10)
+
+	ins_image = ImageTk.PhotoImage(Image.open('instructions1.jpg'))
+	img_label = Label(new, image=ins_image)
+	img_label.pack(pady=5)
+
+	new.mainloop()
+
+
+
 # Initialize Menu
 my_menu = Menu(root)
 root.config(menu=my_menu)
@@ -49,8 +70,8 @@ file_menu.add_command(label='New Merge', command=new_merge)
 file_menu.add_command(label='Exit', command=root.quit)
 help_menu = Menu(my_menu, tearoff=0)
 my_menu.add_cascade(label='Help', menu=help_menu)
-help_menu.add_command(label='About', command=new_merge)
-help_menu.add_command(label='Instructions', command=root.quit)
+help_menu.add_command(label='About', command=about_popup)
+help_menu.add_command(label='Instructions', command=open_instructions)
 
 # Initialize Data structures
 df1 = []
@@ -429,7 +450,6 @@ def start_finalize():
 	merge_cols_button.grid_forget()
 	col1_sel.grid_forget()
 	col2_sel.grid_forget()
-
 
 
 # Main UI Code
