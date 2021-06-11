@@ -5,17 +5,17 @@ This file was written for a non-profit to be able to merge data from different s
 
 ![screenshot of csv merger](https://github.com/billpottle/csvmerger/blob/main/screenshot.jpg?raw=true)
 
-Features: 
+**Features:** 
 
-Can handle any number of matching conditions in the format (A AND B) or (C) or (D AND E). For instance, "First Name" equals 'fname' AND "Last Name" equals 'lname' OR 'email' = 'primary contact email' 
+* Can handle any number of matching conditions in the format (A AND B) or (C) or (D AND E). For instance, "First Name" equals 'fname' AND "Last Name" equals 'lname' OR 'email' = 'primary contact email' 
 
-Can merge certain columns regardless if they match. 
+* Can merge certain columns regardless if they match. 
 
-Can handle custom equality conditions (ie, eventId(42) = eventName('Winter Banquet') through the nickname function. 
+* Can handle custom equality conditions (ie, eventId(42) = eventName('Winter Banquet') through the nickname function. 
 
-Allows user to select case sensitivity. 
+* Allows user to select case sensitivity. 
 
-Instructions:
+**Instructions:**
 
 1) Windows users can download the files in the dist folder and then click on main.py to run
 
