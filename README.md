@@ -9,7 +9,7 @@ This file was written for a non-profit to be able to merge data from different s
 
 * Can handle any number of matching conditions in the format (A AND B) or (C) or (D AND E). For instance, "First Name" equals 'fname' AND "Last Name" equals 'lname' OR 'email' = 'primary contact email' 
 
-* Can merge certain columns regardless if they match. 
+* Can merge certain columns whether or not they match. 
 
 * Can handle custom equality conditions (ie, eventId(42) = eventName('Winter Banquet') through the nickname function. 
 
