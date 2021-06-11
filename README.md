@@ -15,9 +15,11 @@ Allows user to select case sensitivity.
 
 Instructions:
 
-Either download the prebuilt binary for windows or mac
+1) Windows users can download the files in the dist folder and then click on main.py to run
 
-or clone the repo to run from source. Requires python to be installed on your local system. Run the file with 'python main.py'
+or 
+
+2) Alternatively, clone the repo to run from source. This Requires python to be installed on your local system. Run the file with 'python main.py'
 
 
 
