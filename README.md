@@ -3,6 +3,8 @@ A general python GUI file to intelligently merge any 2 CSV files.
 
 This file was written for a non-profit to be able to merge data from different systems (volunteers, donors, vendors, event attendees, social media fans, etc) to one file while identifying and merging data from records that are likely to be from the same person. 
 
+![screenshot of csv merger](https://github.com/billpottle/csvmerger/blob/main/screenshot.jpg?raw=true)
+
 Features: 
 
 Can handle any number of matching conditions in the format (A AND B) or (C) or (D AND E). For instance, "First Name" equals 'fname' AND "Last Name" equals 'lname' OR 'email' = 'primary contact email' 
