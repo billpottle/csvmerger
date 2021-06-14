@@ -17,7 +17,7 @@ This file was written for a non-profit to be able to merge data from different s
 
 **Instructions:**
 
-1) Windows users can download the files in the dist folder and then click on main.py to run
+1) Windows users can download the files in the dist folder and then click on main.exe to run. No installation is required
 
 or 
 
