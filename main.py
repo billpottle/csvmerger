@@ -460,6 +460,11 @@ def merge():
     # For merge cols, copy all data to df1 and delete cols from
     # df2 before beginning
 
+    # Create empty row for merging
+    empty_row = []
+    for i in range(len(final_cols)):
+        empty_row.append("")
+
     # For each row in file 1
     for rownum in range(len(df1)):
         row1 = df1.iloc[rownum].values
@@ -476,7 +481,7 @@ def merge():
                 to_drop.append(rownum2)
         # copy the row to final data
         if match is False:
-            final_data.append(row1)
+            final_data.append(merge_rows(row1, empty_row))
 
     # Any remaining rows in df2 are not present in df1
     df2 = df2.drop(to_drop)
