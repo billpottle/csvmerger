@@ -3,21 +3,25 @@ A general python GUI file to intelligently merge any 2 CSV files.
 
 This file was written for a non-profit to be able to merge data from different systems (volunteers, donors, vendors, event attendees, social media fans, etc) to one file while identifying and merging data from records that are likely to be from the same person. 
 
-Features: 
+![screenshot of csv merger](https://github.com/billpottle/csvmerger/blob/main/screenshot.jpg?raw=true)
 
-Can handle any number of matching conditions in the format (A AND B) or (C) or (D AND E). For instance, "First Name" equals 'fname' AND "Last Name" equals 'lname' OR 'email' = 'primary contact email' 
+**Features:** 
 
-Can merge certain columns regardless if they match. 
+* Can handle any number of matching conditions in the format (A AND B) or (C) or (D AND E). For instance, "First Name" equals 'fname' AND "Last Name" equals 'lname' OR 'email' = 'primary contact email' 
 
-Can handle custom equality conditions (ie, eventId(42) = eventName('Winter Banquet') through the nickname function. 
+* Can merge certain columns whether or not they match. 
 
-Allows user to select case sensitivity. 
+* Can handle custom equality conditions (ie, eventId(42) = eventName('Winter Banquet') through the nickname function. 
 
-Instructions:
+* Allows user to select case sensitivity. 
 
-Either download the prebuilt binary for windows or mac
+**Instructions:**
 
-or clone the repo to run from source. Requires python to be installed on your local system. Run the file with 'python main.py'
+1) Windows users can download the files in the dist folder and then click on main.exe to run. No installation is required
+
+or 
+
+2) Alternatively, clone the repo to run from source. This Requires python to be installed on your local system. Run the file with 'python main.py'
 
 
 
