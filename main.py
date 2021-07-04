@@ -5,6 +5,7 @@ from tkinter import messagebox
 from tkinter import filedialog
 import pandas as pd
 from nicknameparser import *
+import os
 
 root = Tk()
 root.title("CSV Merger")
@@ -332,26 +333,32 @@ def add_or_condition():
 
 def items_match(a, b):
     global case_sensitive, include_nicknames
-
+    # One of both items being empty means no match
+    if not a or not b or a == "nan" or b == "nan" or pd.isna(a) or pd.isna(b):
+        return False
     # create a set including all nicknames
-    if include_nicknames:
+
+    if include_nicknames.get():
         a_names = nicknames.get(a, {})
         b_names = nicknames.get(b, {})
-        a_names_lower = {}
-        if a_names:
-            a_names_lower = set(n.lower() for n in a_names)
-        b_names_lower = {}
-        if b_names:
-            b_names_lower = set(n.lower() for n in b_names)
+        # names file is already lowercase
+        a_names_lower = a_names
+        b_names_lower = b_names
+        # a_names_lower = {}
+        # if a_names:
+        # a_names_lower = set(n.lower() for n in a_names)
+        # b_names_lower = {}
+        # if b_names:
+        # b_names_lower = set(n.lower() for n in b_names)
 
     # Handle 4 potential cases
-    if case_sensitive and not include_nicknames:
+    if case_sensitive.get() and not include_nicknames.get():
         return a == b
-    if case_sensitive and include_nicknames:
+    if case_sensitive.get() and include_nicknames.get():
         return a == b or a in b_names or b in a_names
-    if not case_sensitive and not include_nicknames:
+    if not case_sensitive.get() and not include_nicknames.get():
         return a.lower() == b.lower()
-    if not case_sensitive and include_nicknames:
+    if not case_sensitive.get() and include_nicknames.get():
         return a == b or a.lower() in b_names_lower or b.lower in a_names_lower
 
 
@@ -560,7 +567,9 @@ def open_file_1():
     cols.insert(0, "Column from File 1")
     check_show_begin()
     load_first_button.grid_forget()
-    first_file_label.config(text=root.filename + " loaded")
+    name = os.path.basename(root.filename)
+    name = name[:50] if len(name) > 50 else name
+    first_file_label.config(text=name + " loaded")
     first_file_label.grid(row=2, column=0)
 
 
@@ -576,7 +585,9 @@ def open_file_2():
     cols2.insert(0, "Column from File 2")
     check_show_begin()
     load_second_button.grid_forget()
-    second_file_label.config(text=root.filename + " loaded")
+    name = os.path.basename(root.filename)
+    name = name[:50] if len(name) > 50 else name
+    second_file_label.config(text=name + " loaded")
     second_file_label.grid(row=2, column=1)
 
 
@@ -618,6 +629,7 @@ include_nicknames_box = Checkbutton(
 )
 include_nicknames_box.deselect()
 include_nicknames_box.grid(row=15, column=1)
+print("including nicknames", include_nicknames.get())
 
 load_first_button = Button(
     root, text="Load First File", bg="#FFFFFF", command=open_file_1
